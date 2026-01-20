@@ -4,7 +4,7 @@
 .env.*.local
 
 # Secrets and credentials
-config.js
+# config.js - ALLOWED: uses Supabase publishable key (safe to expose)
 *.key
 *.pem
 
