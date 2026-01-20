@@ -1,0 +1,77 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Secrets and credentials
+config.js
+*.key
+*.pem
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor directories and files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node modules
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Vercel
+.vercel
+
+# Testing
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+
+# CSV data files (don't commit large datasets)
+*.csv
+State Data/*.csv
+
+# Ruby
+*.gem
+*.rbc
+.bundle
+vendor/bundle
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Local database files
+*.sqlite
+*.db

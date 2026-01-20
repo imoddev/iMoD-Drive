@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>iMoD Drive • สถิติจดทะเบียนรถยนต์ไทย</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="container">
+      <div class="brand">
+        <div class="brand__title">iMoD Drive</div>
+        <div class="brand__subtitle">สถิติจดทะเบียนรถยนต์ไทย (Supabase)</div>
+      </div>
+      <nav class="tabs" aria-label="เมนู">
+        <button class="tab tab--active" data-tab="overview">ภาพรวมตลาด</button>
+        <button class="tab" data-tab="explore">สำรวจข้อมูล</button>
+        <button class="tab" data-tab="upload">อัปโหลด</button>
+        <button class="tab" data-tab="about">เกี่ยวกับ</button>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section id="status" class="card status">
+        <div class="status__title">สถานะ</div>
+        <div id="statusText" class="status__text">กำลังเชื่อมต่อ Supabase…</div>
+      </section>
+
+      <section id="overview" class="tabpane tabpane--active" aria-label="ภาพรวมตลาด">
+        <div class="grid grid--2">
+          <div class="card">
+            <div class="card__header">
+              <div>
+                <div class="card__title">ยอดจดทะเบียนรายเดือน</div>
+                <div class="card__subtitle">เลือกปี พ.ศ. เพื่อดูเทรนด์</div>
+              </div>
+              <div class="controls">
+                <div id="yearTotalLabel" class="pill">รวมทั้งปี: —</div>
+              </div>
+              <div class="controls">
+                <label class="label">
+                  ปี พ.ศ.
+                  <select id="yearSelect" class="select"></select>
+                </label>
+              </div>
+            </div>
+            <div class="card__body">
+              <canvas id="monthlyTotalsChart" height="120"></canvas>
+              <div id="monthlyTotalsEmpty" class="empty hidden">ยังไม่มีข้อมูลสำหรับปีนี้</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__header">
+              <div>
+                <div class="card__title">สัดส่วนตามประเภทรถ (เดือนล่าสุด)</div>
+                <div id="latestMonthLabel" class="card__subtitle">—</div>
+              </div>
+            </div>
+            <div class="card__body">
+              <canvas id="vehicleTypeShareChart" height="120"></canvas>
+              <div id="vehicleTypeEmpty" class="empty hidden">ยังไม่มีข้อมูลเดือนล่าสุด</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid--2">
+          <div class="card">
+            <div class="card__header">
+              <div>
+                <div class="card__title">Top แบรนด์</div>
+                <div class="card__subtitle">รวมทั้งปี (ตามข้อมูลที่นำเข้า)</div>
+              </div>
+            </div>
+            <div class="card__body">
+              <table class="table" id="topBrandsTable">
+                <thead>
+                  <tr>
+                    <th>อันดับ</th>
+                    <th>ยี่ห้อ</th>
+                    <th class="num">จำนวน</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <div id="topBrandsEmpty" class="empty hidden">ยังไม่มีข้อมูล</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__header">
+              <div>
+                <div class="card__title">Top รุ่น</div>
+                <div class="card__subtitle">รวมทั้งปี (ตามข้อมูลที่นำเข้า)</div>
+              </div>
+            </div>
+            <div class="card__body">
+              <table class="table" id="topModelsTable">
+                <thead>
+                  <tr>
+                    <th>อันดับ</th>
+                    <th>ยี่ห้อ</th>
+                    <th>รุ่น</th>
+                    <th class="num">จำนวน</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <div id="topModelsEmpty" class="empty hidden">ยังไม่มีข้อมูล</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="explore" class="tabpane" aria-label="สำรวจข้อมูล">
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title">สำรวจข้อมูล (Drilldown)</div>
+              <div class="card__subtitle">กรองตามปี/เดือน/ประเภทรถ/ยี่ห้อ/Powertrain (ถ้ามี mapping)</div>
+            </div>
+          </div>
+          <div class="card__body">
+            <form id="exploreForm" class="form">
+              <label class="label">
+                ปี พ.ศ.
+                <select id="exploreYear" class="select"></select>
+              </label>
+              <label class="label">
+                เดือน (ไม่ใส่ = ทั้งปี)
+                <input id="exploreMonth" class="input" type="number" min="1" max="12" placeholder="1-12" />
+              </label>
+              <label class="label">
+                ประเภทรถ (ตรงตัว)
+                <input id="exploreType" class="input" type="text" placeholder="เช่น รถยนต์นั่งส่วนบุคคลไม่เกิน 7 คน" />
+              </label>
+              <label class="label">
+                ยี่ห้อ (ตรงตัว)
+                <input id="exploreBrand" class="input" type="text" placeholder="เช่น BYD" />
+              </label>
+              <label class="label">
+                Powertrain
+                <select id="explorePowertrain" class="select">
+                  <option value="">ทั้งหมด</option>
+                  <option value="EV">EV</option>
+                  <option value="PHEV">PHEV</option>
+                  <option value="HEV">HEV</option>
+                  <option value="ICE">ICE</option>
+                  <option value="Unknown">Unknown</option>
+                </select>
+              </label>
+              <button class="button" type="submit">ค้นหา</button>
+            </form>
+
+            <div class="card card--sub">
+              <div class="card__header">
+                <div class="card__title">ผลลัพธ์ (Top 200)</div>
+              </div>
+              <div class="card__body">
+                <table class="table" id="exploreTable">
+                  <thead>
+                    <tr>
+                      <th>ปี</th>
+                      <th>เดือน</th>
+                      <th>ประเภทรถ</th>
+                      <th>ยี่ห้อ</th>
+                      <th>รุ่น</th>
+                      <th>Powertrain</th>
+                      <th class="num">จำนวน</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+                <div id="exploreEmpty" class="empty hidden">ยังไม่มีข้อมูล (หรือเงื่อนไขไม่ตรง)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="upload" class="tabpane" aria-label="อัปโหลด">
+        <div class="grid grid--2">
+          <div class="card">
+            <div class="card__header">
+              <div>
+                <div class="card__title">เข้าสู่ระบบทีมงาน</div>
+                <div class="card__subtitle">ต้องมีบัญชีใน Supabase Auth เพื่ออัปโหลดไฟล์</div>
+              </div>
+            </div>
+            <div class="card__body">
+              <div id="authSignedOut" class="stack">
+                <div class="callout">
+                  ใช้ได้ 2 วิธี: (1) Email + Password (2) ส่งลิงก์เข้าสู่ระบบ (OTP/Magic link)
+                </div>
+                <label class="label">
+                  Email
+                  <input id="authEmail" class="input" type="email" placeholder="you@domain.com" autocomplete="email" />
+                </label>
+                <label class="label">
+                  Password (ถ้าใช้)
+                  <input
+                    id="authPassword"
+                    class="input"
+                    type="password"
+                    placeholder="••••••••"
+                    autocomplete="current-password"
+                  />
+                </label>
+                <div class="row">
+                  <button id="btnSignInPassword" class="button" type="button">Sign in</button>
+                  <button id="btnSendMagicLink" class="button button--secondary" type="button">Send magic link</button>
+                </div>
+                <div class="hint">
+                  ถ้าเปิดให้สมัครเอง (signups) แนะนำปิดใน Supabase Auth หรือจำกัด policy เฉพาะทีมงาน
+                </div>
+              </div>
+
+              <div id="authSignedIn" class="stack hidden">
+                <div class="callout callout--ok">
+                  เข้าสู่ระบบแล้ว: <span id="authUserEmail"></span>
+                </div>
+                <div class="row">
+                  <button id="btnSignOut" class="button button--secondary" type="button">Sign out</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__header">
+              <div>
+                <div class="card__title">อัปโหลดไฟล์ CSV</div>
+                <div class="card__subtitle">อัปโหลดเข้า Storage: <code>state-data/raw/{year}/{month}/...</code></div>
+              </div>
+            </div>
+            <div class="card__body">
+              <div class="stack">
+                <label class="label">
+                  ไฟล์ CSV
+                  <input id="uploadFile" class="input" type="file" accept=".csv,text/csv" />
+                </label>
+                <div class="row">
+                  <label class="label">
+                    ปี พ.ศ.
+                    <input id="uploadYear" class="input" type="number" min="2500" max="3000" placeholder="2568" />
+                  </label>
+                  <label class="label">
+                    เดือน (เลข)
+                    <input id="uploadMonth" class="input" type="number" min="1" max="12" placeholder="1" />
+                  </label>
+                </div>
+                <label class="label">
+                  ชื่อไฟล์ปลายทาง (แก้ได้)
+                  <input id="uploadFilename" class="input" type="text" placeholder="sttt_car_new_reg_mm_2568_01.csv" />
+                </label>
+                <label class="label">
+                  <span>ตัวเลือก</span>
+                  <label class="checkbox">
+                    <input id="uploadOverwrite" type="checkbox" />
+                    <span>อนุญาตให้ทับไฟล์เดิม (overwrite)</span>
+                  </label>
+                </label>
+                <div class="row">
+                  <button id="btnUpload" class="button" type="button">Upload to Supabase</button>
+                </div>
+                <div id="uploadResult" class="callout hidden"></div>
+                <div class="hint">
+                  หมายเหตุ: ค่าเริ่มต้นจะไม่ “ทับไฟล์เดิม” ถ้าชื่อซ้ำ เพื่อให้ตรวจสอบย้อนหลังได้ (เปิด overwrite ได้ถ้าจำเป็น)
+                </div>
+                <div class="hint">
+                  หลังอัปโหลด ระบบจะ parse CSV ในเบราว์เซอร์และเรียก RPC เพื่อ insert ลงตารางใน Supabase ทันที
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__header">
+              <div>
+                <div class="card__title">นำเข้าข้อมูลจากไฟล์ที่อยู่ใน Storage แล้ว</div>
+                <div class="card__subtitle">ใช้กรณีไฟล์อยู่ใน <code>state-data/raw/...</code> แล้วไม่ต้องอัปโหลดซ้ำ</div>
+              </div>
+            </div>
+            <div class="card__body">
+              <div class="stack">
+                <label class="label">
+                  Object path ใน bucket <code>state-data</code>
+                  <input
+                    id="ingestObjectPath"
+                    class="input"
+                    type="text"
+                    placeholder="raw/2568/04/sttt_car_new_reg_mm_2568_04.csv"
+                  />
+                </label>
+                <div class="row">
+                  <button id="btnIngestFromStorage" class="button" type="button">Ingest from Storage</button>
+                </div>
+                <div class="hint">ต้องล็อกอินก่อน และต้องมีสิทธิ์อ่านไฟล์ใน Storage (role authenticated)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title">ประวัติการอัปโหลด (Log)</div>
+              <div class="card__subtitle">แสดงเฉพาะผู้ใช้ที่ล็อกอิน (อ่านได้สำหรับทีมงาน)</div>
+            </div>
+            <div class="controls">
+              <button id="btnRefreshUploadLogs" class="button button--secondary" type="button">Refresh</button>
+            </div>
+          </div>
+          <div class="card__body">
+            <table class="table" id="uploadLogsTable">
+              <thead>
+                <tr>
+                  <th>เวลา</th>
+                  <th>ผู้ใช้</th>
+                  <th>Bucket</th>
+                  <th>Path</th>
+                  <th class="num">ขนาด</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div id="uploadLogsEmpty" class="empty hidden">ยังไม่มีประวัติ หรือยังไม่ได้ล็อกอิน</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title">ประวัติการนำเข้าข้อมูล (Ingestion)</div>
+              <div class="card__subtitle">ถ้าไฟล์อยู่ใน Storage แต่กราฟไม่ขึ้น ให้เช็คว่ามีสถานะ succeeded หรือไม่</div>
+            </div>
+            <div class="controls">
+              <button id="btnRefreshIngestionRuns" class="button button--secondary" type="button">Refresh</button>
+            </div>
+          </div>
+          <div class="card__body">
+            <table class="table" id="ingestionRunsTable">
+              <thead>
+                <tr>
+                  <th>เริ่ม</th>
+                  <th>จบ</th>
+                  <th>สถานะ</th>
+                  <th>ปี</th>
+                  <th>เดือน</th>
+                  <th>ไฟล์</th>
+                  <th class="num">แถว</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div id="ingestionRunsEmpty" class="empty hidden">ยังไม่มี ingestion run (ต้องตั้งค่า n8n ให้ ingest หลังอัปโหลด)</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="tabpane" aria-label="เกี่ยวกับ">
+        <div class="card">
+          <div class="card__header">
+            <div class="card__title">เกี่ยวกับระบบ</div>
+          </div>
+          <div class="card__body prose">
+            <p>
+              หน้าเว็บนี้ดึงข้อมูลจาก Supabase ผ่าน RPC functions เพื่อสร้างสถิติหลายมิติ เช่น เทรนด์รายเดือน,
+              อันดับยี่ห้อ/รุ่น และตารางสำรวจข้อมูล
+            </p>
+            <p>
+              หากต้องการโฟกัสเฉพาะ EV แนะนำเติมข้อมูลใน <code>model_profile.powertrain</code> และ
+              <code>brand_profile.origin_country_id</code> เพื่อทำมิติ “EV vs non‑EV” และ “ผู้ผลิตประเทศไหนขายดี”
+              ได้แม่นยำ
+            </p>
+            <p>
+              ที่มา/คอนเทนต์: iMoD Drive และเว็บไซต์ <a href="https://www.ev.iphonemod.net" target="_blank" rel="noreferrer">www.ev.iphonemod.net</a>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="container footer">
+      <span>© iMoD Drive • Data powered by Supabase</span>
+    </footer>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

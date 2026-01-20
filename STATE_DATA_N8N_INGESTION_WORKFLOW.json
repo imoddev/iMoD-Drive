@@ -1,0 +1,246 @@
+{
+  "name": "Supabase CSV Ingestion",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "supabase-storage-trigger",
+        "responseData": "default"
+      },
+      "name": "Supabase Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "supabase_csv_trigger"
+    },
+    {
+      "parameters": {
+        "functionCode": "const payload = items[0].json;\nif (!payload.object_id || !payload.name.endsWith('.csv')) {\n  throw new Error('non csv file');\n}\nreturn [{ json: payload }];"
+      },
+      "name": "Validate Path",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://{{ $json[\"bucket_id\"] }}.supabase.co/storage/v1/object/public/{{ $json[\"name\"] }}",
+        "responseFormat": "file",
+        "options": {}
+      },
+      "name": "Download CSV",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "Supabase service role",
+          "name": "Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {},
+        "mode": "binary",
+        "dataPropertyName": "data"
+      },
+      "name": "Parse CSV",
+      "type": "n8n-nodes-base.csvFile",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const rows = items[0].json;\nconst count = rows.length;\nreturn [{ json: { rows, count } }];"
+      },
+      "name": "Prepare Payload",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH time_dim AS (\n  INSERT INTO dim_time (year_be, month_num, month_th)\n  VALUES (:year, :month_num, :month)\n  ON CONFLICT (year_be, month_num) DO UPDATE SET month_th = EXCLUDED.month_th\n  RETURNING id\n),\nvehicle_type AS (\n  INSERT INTO dim_vehicle_type (type_name)\n  VALUES (:type)\n  ON CONFLICT (type_name) DO NOTHING\n  RETURNING id\n)\nSELECT 1;"
+      },
+      "name": "Upsert Dimensions",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Supabase",
+          "name": "Supabase Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO fact_registrations (run_id, time_id, type_id, brand_id, model_id, count)\nSELECT :run_id, t.id, tt.id, b.id, m.id, SUM(data.count)\nFROM jsonb_to_recordset(:payload::jsonb) as data(year text, month text, type text, brand text, model text, count int)\nJOIN dim_time t ON t.year_be = :year AND t.month_th = :month\nJOIN dim_vehicle_type tt ON tt.type_name = data.type\nJOIN dim_brand b ON b.brand_name = data.brand\nJOIN dim_model m ON m.model_name = data.model AND m.brand_id = b.id\nGROUP BY t.id, tt.id, b.id, m.id"
+      },
+      "name": "Insert Facts",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1450,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Supabase",
+          "name": "Supabase Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE ingestion_runs SET status = 'succeeded', row_count = :count, finished_at = now() WHERE id = :run_id"
+      },
+      "name": "Finalize Run",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1650,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Supabase",
+          "name": "Supabase Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO ingestion_runs (bucket, object_path, file_sha256, status, year_be, month_th, month_num)\nVALUES (:bucket, :name, :sha256, 'running', :year, :month, :month_num)\nRETURNING id"
+      },
+      "name": "Create Run",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        150
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Supabase",
+          "name": "Supabase Postgres"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Supabase Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate Path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Path": {
+      "main": [
+        [
+          {
+            "node": "Create Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Run": {
+      "main": [
+        [
+          {
+            "node": "Download CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download CSV": {
+      "main": [
+        [
+          {
+            "node": "Parse CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse CSV": {
+      "main": [
+        [
+          {
+            "node": "Prepare Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Payload": {
+      "main": [
+        [
+          {
+            "node": "Upsert Dimensions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Dimensions": {
+      "main": [
+        [
+          {
+            "node": "Insert Facts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Facts": {
+      "main": [
+        [
+          {
+            "node": "Finalize Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "activeWorkflows": []
+}
