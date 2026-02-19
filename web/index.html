@@ -15,6 +15,7 @@
       <nav class="tabs" aria-label="เมนู">
         <button class="tab tab--active" data-tab="overview">ภาพรวมตลาด</button>
         <button class="tab" data-tab="explore">สำรวจข้อมูล</button>
+        <button class="tab" data-tab="evspec">🚗 สเปครถ EV</button>
         <button class="tab" data-tab="upload">อัปโหลด</button>
         <button class="tab" data-tab="about">เกี่ยวกับ</button>
       </nav>
@@ -386,6 +387,65 @@
       <span>© iMoD Drive • Data powered by Supabase</span>
     </footer>
 
+    <!-- ═══ EVSPEC TAB ═══ -->
+    <section id="evspec" class="tabpane evspec-root" aria-label="สเปครถ EV">
+
+      <!-- Toolbar -->
+      <div class="evs-toolbar">
+        <div class="evs-toolbar-left">
+          <div class="evs-search-box">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="evs-search" class="evs-search-input" placeholder="ชื่อรุ่น, แบรนด์...">
+          </div>
+          <select class="evs-select" id="evs-sort">
+            <option value="default">เรียง: ค่าเริ่มต้น</option>
+            <option value="price-asc">ราคา ↑</option>
+            <option value="price-desc">ราคา ↓</option>
+            <option value="range-desc">ระยะทาง ↓</option>
+            <option value="hp-desc">แรงม้า ↓</option>
+            <option value="accel-asc">0-100 เร็วสุด</option>
+          </select>
+        </div>
+        <div id="evs-count" class="evs-count">กำลังโหลด...</div>
+      </div>
+
+      <!-- Filters -->
+      <div class="evs-filters-bar" id="evs-filters-bar">
+        <div class="evs-filter-group">
+          <span class="evs-filter-label">แบรนด์</span>
+          <div id="evs-brand-chips" class="evs-chips"></div>
+        </div>
+        <div class="evs-filter-group">
+          <span class="evs-filter-label">ตัวถัง</span>
+          <div id="evs-body-chips" class="evs-chips"></div>
+        </div>
+        <div class="evs-filter-group" style="align-items:center;">
+          <span class="evs-filter-label">ราคา (บาท)</span>
+          <input type="number" id="evs-pmin" class="evs-price-in" placeholder="ต่ำสุด">
+          <span class="evs-filter-label">–</span>
+          <input type="number" id="evs-pmax" class="evs-price-in" placeholder="สูงสุด">
+          <button class="evs-reset-btn" onclick="evsReset()">↺ รีเซ็ต</button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="evs-loading" class="evs-loading">
+        <div class="evs-spinner"></div>
+        <span>กำลังโหลดจาก Google Sheets…</span>
+      </div>
+
+      <!-- Grid -->
+      <div class="evs-grid" id="evs-grid" style="display:none;"></div>
+
+      <!-- Detail (hidden by default) -->
+      <div id="evs-detail" style="display:none;">
+        <button class="evs-back-btn" onclick="evsShowList()">← กลับรายการ</button>
+        <div id="evs-detail-content"></div>
+      </div>
+
+    </section>
+
     <script type="module" src="./app.js"></script>
+    <script src="./evspec.js"></script>
   </body>
 </html>
