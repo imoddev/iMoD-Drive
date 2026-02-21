@@ -523,6 +523,7 @@ a:hover {
   transition: all 0.15s;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 6px;
 }
 .evs-chip:hover {
@@ -530,12 +531,33 @@ a:hover {
   color: var(--accent);
 }
 .evs-chip.active {
+  background: #ffffff;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.evs-chip.active:hover {
+  background: #e0e0e0;
+}
+/* Checkbox icon */
+.evs-chip::after {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.evs-chip.active::after {
+  content: '✓';
   background: var(--accent);
   border-color: var(--accent);
   color: #ffffff;
-}
-.evs-chip.active:hover {
-  background: var(--accent2);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .evs-chip-flag {
   font-size: 14px;
