@@ -883,6 +883,44 @@ a:hover {
 }
 .evs-empty-icon { font-size: 40px; margin-bottom: 12px; }
 
+/* Pagination */
+.evs-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 24px;
+  padding: 16px 0;
+}
+.evs-page-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+  color: var(--text);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.evs-page-btn:hover:not(:disabled) {
+  background: #e0e0e0;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.evs-page-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+.evs-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* Detail - Full Width */
 .evs-detail-fullwidth {
   padding: 24px;

@@ -62,6 +62,8 @@
 
   let allCars = [], filteredCars = [], loaded = false;
   let brandActive = new Set(), bodyActive = new Set(), countryActive = new Set();
+  let currentPage = 1;
+  const ITEMS_PER_PAGE = 20;
 
   /* ── Accordion Toggle ── */
   window.evsToggleSection = function(btn) {
@@ -359,6 +361,7 @@
     else if (sort === 'hp-desc')     filteredCars.sort((a, b) => (b.hpNum||0) - (a.hpNum||0));
     else if (sort === 'accel-asc')   filteredCars.sort((a, b) => (a.accelNum||99) - (b.accelNum||99));
 
+    currentPage = 1; // Reset to first page when filter changes
     renderGrid();
   }
   window.evsApply = evsApply;
@@ -383,13 +386,23 @@
     const grid = document.getElementById('evs-grid');
     const cnt  = document.getElementById('evs-count');
     if (!grid) return;
-    cnt.innerHTML = `<b>${filteredCars.length}</b> รุ่นที่พบ`;
+
+    const totalPages = Math.ceil(filteredCars.length / ITEMS_PER_PAGE);
+    if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+    
+    const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIdx = startIdx + ITEMS_PER_PAGE;
+    const pageCars = filteredCars.slice(startIdx, endIdx);
+
+    cnt.innerHTML = `<b>${filteredCars.length}</b> รุ่นที่พบ | หน้า ${currentPage}/${totalPages || 1}`;
 
     if (!filteredCars.length) {
       grid.innerHTML = '<div class="evs-empty"><div class="evs-empty-icon">🔍</div><div>ไม่พบรถที่ตรงกับเงื่อนไข</div></div>';
+      renderPagination(0);
       return;
     }
-    grid.innerHTML = filteredCars.map(c => {
+    
+    grid.innerHTML = pageCars.map(c => {
       const bt = (c.bodyType || '').split('/')[0].trim();
       const pd = fmtPrice(c.priceStr, c.priceNum);
       return `
@@ -418,7 +431,52 @@
           </div>
         </div>`;
     }).join('');
+    
+    renderPagination(totalPages);
   }
+
+  function renderPagination(totalPages) {
+    let paginationEl = document.getElementById('evs-pagination');
+    if (!paginationEl) {
+      paginationEl = document.createElement('div');
+      paginationEl.id = 'evs-pagination';
+      paginationEl.className = 'evs-pagination';
+      document.getElementById('evs-grid')?.parentNode?.appendChild(paginationEl);
+    }
+    
+    if (totalPages <= 1) {
+      paginationEl.innerHTML = '';
+      return;
+    }
+
+    let pages = [];
+    const maxVisible = 5;
+    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let end = Math.min(totalPages, start + maxVisible - 1);
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    paginationEl.innerHTML = `
+      <button class="evs-page-btn" onclick="evsGoPage(1)" ${currentPage === 1 ? 'disabled' : ''}>«</button>
+      <button class="evs-page-btn" onclick="evsGoPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>
+      ${pages.map(p => `<button class="evs-page-btn ${p === currentPage ? 'active' : ''}" onclick="evsGoPage(${p})">${p}</button>`).join('')}
+      <button class="evs-page-btn" onclick="evsGoPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>
+      <button class="evs-page-btn" onclick="evsGoPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>»</button>
+    `;
+  }
+
+  window.evsGoPage = function(page) {
+    const totalPages = Math.ceil(filteredCars.length / ITEMS_PER_PAGE);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderGrid();
+    document.querySelector('.evs-main')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   /* ── DETAIL ── */
   function specRow(label, val) {
