@@ -476,21 +476,51 @@
         </div>
       </div>`;
 
-    document.getElementById('evs-grid').style.display = 'none';
+    // Hide layout, show detail full width
+    const layout = document.querySelector('.evs-layout');
+    if (layout) layout.style.display = 'none';
     document.getElementById('evs-detail').style.display = 'block';
-    document.getElementById('evs-toolbar')?.style && (document.getElementById('evs-toolbar').style.display = 'none');
-    document.getElementById('evs-sidebar')?.style && (document.getElementById('evs-sidebar').style.display = 'none');
+    
+    // Update URL with car slug
+    const slug = `${c.brand}-${c.model}${c.sub ? '-' + c.sub : ''}`.replace(/\s+/g, '-');
+    history.pushState({ carId: id }, '', `#${encodeURIComponent(slug)}`);
+    
     document.querySelector('.evspec-root')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   window.evsShowList = function() {
     document.getElementById('evs-detail').style.display = 'none';
-    document.getElementById('evs-grid').style.display = 'grid';
-    const tb = document.getElementById('evs-toolbar');
-    const sb = document.getElementById('evs-sidebar');
-    if (tb) tb.style.display = '';
-    if (sb) sb.style.display = '';
+    const layout = document.querySelector('.evs-layout');
+    if (layout) layout.style.display = 'grid';
+    
+    // Clear URL hash
+    history.pushState({}, '', window.location.pathname);
   };
+  
+  // Handle browser back/forward
+  window.addEventListener('popstate', function(e) {
+    if (e.state && e.state.carId) {
+      const c = allCars.find(x => x.id === e.state.carId);
+      if (c) evsShowDetail(c.id);
+    } else {
+      evsShowList();
+    }
+  });
+  
+  // Check URL hash on load
+  function checkUrlHash() {
+    const hash = decodeURIComponent(window.location.hash.slice(1));
+    if (hash && allCars.length) {
+      // Try to find car by slug (Brand-Model-Sub)
+      const car = allCars.find(c => {
+        const slug = `${c.brand}-${c.model}${c.sub ? '-' + c.sub : ''}`.replace(/\s+/g, '-');
+        return slug.toLowerCase() === hash.toLowerCase();
+      });
+      if (car) {
+        setTimeout(() => evsShowDetail(car.id), 100);
+      }
+    }
+  }
 
   /* ── EVENT LISTENERS (lazy bind) ── */
   function bindListeners() {
@@ -516,6 +546,7 @@
       renderChips();
       bindListeners();
       evsApply();
+      checkUrlHash(); // Check if URL has car slug
     }).catch(err => {
       console.error('[evspec] load error:', err);
       const el = document.getElementById('evs-loading');

@@ -818,24 +818,38 @@ header.container {
 }
 .evs-empty-icon { font-size: 40px; margin-bottom: 12px; }
 
-/* Detail */
+/* Detail - Full Width */
+.evs-detail-fullwidth {
+  padding: 20px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.evs-detail-fullwidth .container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
 .evs-back-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 18px;
-  background: rgba(37, 99, 235, 0.1);
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  border-radius: 999px;
-  font-size: 13px;
+  padding: 10px 20px;
+  background: var(--bg);
+  border: 1px solid var(--line-dark);
+  color: var(--text);
+  border-radius: 8px;
+  font-size: 14px;
   font-family: inherit;
   cursor: pointer;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   transition: all 0.15s;
 }
-.evs-back-btn:hover { background: var(--accent); color: #ffffff; }
+.evs-back-btn:hover { 
+  background: var(--bg-alt);
+  border-color: var(--accent);
+  color: var(--accent);
+}
 .evs-detail-card {
   background: var(--card);
   border: 1px solid var(--line-dark);
