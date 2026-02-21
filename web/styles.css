@@ -526,13 +526,16 @@ a:hover {
   gap: 6px;
 }
 .evs-chip:hover {
-  background: #f5f5f5;
-  border-color: var(--accent);
+  background: #e0e0e0;
+  color: var(--accent);
 }
 .evs-chip.active {
   background: var(--accent);
   border-color: var(--accent);
   color: #ffffff;
+}
+.evs-chip.active:hover {
+  background: var(--accent2);
 }
 .evs-chip-flag {
   font-size: 14px;
