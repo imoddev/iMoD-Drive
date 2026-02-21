@@ -396,6 +396,24 @@ header.container {
   font-size: 12px;
 }
 
+/* Global Footer */
+.global-footer {
+  background: var(--bg-alt);
+  border-top: 1px solid var(--line);
+  padding: 20px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 40px;
+}
+.global-footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.global-footer a:hover {
+  text-decoration: underline;
+}
+
 /* ═══════════════════════════════════════
    EV SPEC TAB — evspec.js companion CSS
    ═══════════════════════════════════════ */
