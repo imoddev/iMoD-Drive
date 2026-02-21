@@ -31,16 +31,29 @@ function show(elId, visible) {
 }
 
 function setActiveTab(tabName) {
+  // Remove active from all tabs and dropdown items
   document.querySelectorAll(".tab").forEach((b) => {
     b.classList.toggle("tab--active", b.dataset.tab === tabName);
   });
+  document.querySelectorAll(".tab-dropdown-item").forEach((b) => {
+    b.classList.toggle("tab--active", b.dataset.tab === tabName);
+  });
+  // Also highlight dropdown toggle if any dropdown item is active
+  const dropdownTabs = ["overview", "explore", "upload"];
+  const dropdownToggle = document.querySelector(".tab-dropdown-toggle");
+  if (dropdownToggle) {
+    dropdownToggle.classList.toggle("tab--active", dropdownTabs.includes(tabName));
+  }
   document.querySelectorAll(".tabpane").forEach((p) => {
     p.classList.toggle("tabpane--active", p.id === tabName);
   });
 }
 
 function installTabs() {
-  document.querySelectorAll(".tab").forEach((b) => {
+  document.querySelectorAll(".tab[data-tab]").forEach((b) => {
+    b.addEventListener("click", () => setActiveTab(b.dataset.tab));
+  });
+  document.querySelectorAll(".tab-dropdown-item[data-tab]").forEach((b) => {
     b.addEventListener("click", () => setActiveTab(b.dataset.tab));
   });
 }

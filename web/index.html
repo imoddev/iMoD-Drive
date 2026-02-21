@@ -13,10 +13,15 @@
         <div class="brand__subtitle">สถิติจดทะเบียนรถยนต์ไทย (Supabase)</div>
       </div>
       <nav class="tabs" aria-label="เมนู">
-        <button class="tab tab--active" data-tab="overview">ภาพรวมตลาด</button>
-        <button class="tab" data-tab="explore">สำรวจข้อมูล</button>
-        <button class="tab" data-tab="evspec">🚗 สเปครถ EV</button>
-        <button class="tab" data-tab="upload">อัปโหลด</button>
+        <button class="tab tab--active" data-tab="evspec">🚗 สเปครถ EV</button>
+        <div class="tab-dropdown">
+          <button class="tab tab-dropdown-toggle">📊 สถิติรถ <span class="dropdown-arrow">▼</span></button>
+          <div class="tab-dropdown-menu">
+            <button class="tab-dropdown-item" data-tab="overview">ภาพรวมตลาด</button>
+            <button class="tab-dropdown-item" data-tab="explore">สำรวจข้อมูล</button>
+            <button class="tab-dropdown-item" data-tab="upload">อัปโหลด</button>
+          </div>
+        </div>
         <button class="tab" data-tab="about">เกี่ยวกับ</button>
       </nav>
     </header>
@@ -27,7 +32,7 @@
         <div id="statusText" class="status__text">กำลังเชื่อมต่อ Supabase…</div>
       </section>
 
-      <section id="overview" class="tabpane tabpane--active" aria-label="ภาพรวมตลาด">
+      <section id="overview" class="tabpane" aria-label="ภาพรวมตลาด">
         <div class="grid grid--2">
           <div class="card">
             <div class="card__header">
@@ -388,7 +393,7 @@
     </footer>
 
     <!-- ═══ EVSPEC TAB ═══ -->
-    <section id="evspec" class="tabpane evspec-root" aria-label="สเปครถ EV">
+    <section id="evspec" class="tabpane tabpane--active evspec-root" aria-label="สเปครถ EV">
 
       <!-- Toolbar -->
       <div class="evs-toolbar">
