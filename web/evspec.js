@@ -63,7 +63,7 @@
   let allCars = [], filteredCars = [], loaded = false;
   let brandActive = new Set(), bodyActive = new Set(), countryActive = new Set();
   let currentPage = 1;
-  const ITEMS_PER_PAGE = 20;
+  const ITEMS_PER_PAGE = 21;
 
   /* ── Accordion Toggle ── */
   window.evsToggleSection = function(btn) {
