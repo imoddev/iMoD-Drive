@@ -530,6 +530,13 @@ a:hover {
 .evs-chip-text {
   flex: 1;
   text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.evs-chip-flag {
+  font-size: 14px;
+  flex-shrink: 0;
 }
 .evs-chip:hover {
   background: #e0e0e0;
