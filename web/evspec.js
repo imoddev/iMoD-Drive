@@ -348,25 +348,27 @@
       const pd = fmtPrice(c.priceStr, c.priceNum);
       return `
         <div class="evs-card" onclick="evsShowDetail(${c.id})">
-          <div class="evs-card-top">
-            <div class="evs-flag">${c.flag}</div>
+          <div class="evs-img">
+            🚗
+            <span class="evs-flag">${c.flag}</span>
+          </div>
+          <div class="evs-card-content">
             <div class="evs-brand-label">${c.brand}</div>
             <div class="evs-model-name">${c.model}</div>
-            <div class="evs-sub-name">${c.sub || '—'}</div>
-          </div>
-          <div class="evs-img">🚗</div>
-          <div class="evs-specs">
-            ${c.range ? `<div class="evs-spec-row"><span class="evs-sk">ระยะทาง</span><span class="evs-sv">${c.range}</span></div>` : ''}
-            ${c.hp ? `<div class="evs-spec-row"><span class="evs-sk">แรงม้า</span><span class="evs-sv">${c.hp} Hp</span></div>` : ''}
-            ${c.batt ? `<div class="evs-spec-row"><span class="evs-sk">แบตเตอรี่</span><span class="evs-sv">${c.batt} kWh</span></div>` : ''}
-            ${c.dc ? `<div class="evs-spec-row"><span class="evs-sk">DC Max</span><span class="evs-sv">${c.dc} kW</span></div>` : ''}
-          </div>
-          <div class="evs-card-footer">
-            <div>${bt ? `<span class="evs-body-badge">${bt}</span>` : ''}</div>
-            <div class="evs-price-wrap">
-              ${pd ? `<div class="evs-price-sub">ราคาเริ่มต้น</div><div class="evs-price">${pd}</div>`
-                   : `<div class="evs-no-price">ไม่ระบุราคา</div>`}
+            <div class="evs-sub-name">${c.sub || ''}</div>
+            
+            <div class="evs-price-section">
+              ${pd ? `<div class="evs-price">${pd}</div>` : `<div class="evs-no-price">ราคายังไม่ประกาศ</div>`}
             </div>
+            
+            <div class="evs-specs">
+              ${c.range ? `<div class="evs-spec-item"><span class="evs-spec-label">ระยะทาง</span><span class="evs-spec-value">${c.range} กม.</span></div>` : ''}
+              ${c.hp ? `<div class="evs-spec-item"><span class="evs-spec-label">แรงม้า</span><span class="evs-spec-value">${c.hp} Hp</span></div>` : ''}
+              ${c.batt ? `<div class="evs-spec-item"><span class="evs-spec-label">แบตเตอรี่</span><span class="evs-spec-value">${c.batt} kWh</span></div>` : ''}
+              ${c.dc ? `<div class="evs-spec-item"><span class="evs-spec-label">ชาร์จ DC</span><span class="evs-spec-value">${c.dc} kW</span></div>` : ''}
+            </div>
+            
+            ${bt ? `<span class="evs-body-badge">${bt}</span>` : ''}
           </div>
         </div>`;
     }).join('');

@@ -643,103 +643,145 @@ header.container {
 /* Grid */
 .evs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 1200px) {
+  .evs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  .evs-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Card */
 .evs-card {
   background: var(--card);
   border: 1px solid var(--line-dark);
-  border-radius: 14px;
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 .evs-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   box-shadow: var(--shadow-hover);
   border-color: var(--accent);
 }
-.evs-card-top {
-  padding: 14px 14px 0;
+
+/* Card Image Area */
+.evs-img {
+  width: 100%;
+  height: 160px;
+  background: linear-gradient(135deg, var(--bg-alt) 0%, #e8eaed 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  opacity: 0.3;
   position: relative;
 }
 .evs-flag {
   position: absolute;
-  top: 10px; right: 10px;
-  font-size: 20px;
+  top: 12px;
+  right: 12px;
+  font-size: 18px;
+  background: var(--bg);
+  padding: 4px 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Card Content */
+.evs-card-content {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 .evs-brand-label {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   color: var(--muted);
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 .evs-model-name {
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 1.2;
-  padding-right: 28px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
   color: var(--text);
+  margin-bottom: 2px;
 }
 .evs-sub-name {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+/* Price Section */
+.evs-price-section {
+  margin-bottom: 12px;
+}
+.evs-price {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+}
+.evs-price-sub {
   font-size: 11px;
   color: var(--muted);
-  margin-top: 2px;
 }
-.evs-img {
-  width: 100%;
-  height: 140px;
-  background: var(--bg-alt);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 10px 0 0;
-  font-size: 50px;
-  opacity: 0.25;
+.evs-no-price {
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
 }
+
+/* Specs Grid */
 .evs-specs {
-  padding: 8px 14px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding-top: 12px;
   border-top: 1px solid var(--line);
+  margin-top: auto;
 }
-.evs-spec-row {
+.evs-spec-item {
   display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-  font-size: 12px;
-  border-bottom: 1px solid var(--line);
+  flex-direction: column;
+  gap: 2px;
 }
-.evs-spec-row:last-child { border-bottom: none; }
-.evs-sk { color: var(--muted); }
-.evs-sv { font-weight: 600; color: var(--text); text-align: right; }
-.evs-card-footer {
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1px solid var(--line);
-  background: var(--bg-alt);
-}
-.evs-body-badge {
+.evs-spec-label {
   font-size: 10px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  background: rgba(37, 99, 235, 0.1);
-  border: 1px solid rgba(37, 99, 235, 0.25);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.evs-spec-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Body Badge */
+.evs-body-badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.2);
   color: var(--accent);
   font-weight: 600;
-  max-width: 110px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  margin-top: 12px;
 }
-.evs-price-wrap { text-align: right; }
-.evs-price { font-size: 15px; font-weight: 800; color: var(--text); }
-.evs-price-sub { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
-.evs-no-price { font-size: 12px; color: var(--muted); }
 
 /* Empty */
 .evs-empty {
