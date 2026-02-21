@@ -314,6 +314,14 @@ header.container {
   display: block;
 }
 
+/* Stats container - hidden by default, shown via JS */
+.main-stats-container {
+  display: block;
+}
+.main-stats-container.hidden {
+  display: none;
+}
+
 .prose {
   color: var(--text);
   line-height: 1.7;

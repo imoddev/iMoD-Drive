@@ -47,6 +47,14 @@ function setActiveTab(tabName) {
   document.querySelectorAll(".tabpane").forEach((p) => {
     p.classList.toggle("tabpane--active", p.id === tabName);
   });
+  
+  // Hide/show main stats container based on active tab
+  const statsContainer = document.querySelector(".main-stats-container");
+  if (statsContainer) {
+    // Show only for stats-related tabs (overview, explore, upload, about)
+    const showStats = ["overview", "explore", "upload", "about"].includes(tabName);
+    statsContainer.classList.toggle("hidden", !showStats);
+  }
 }
 
 function installTabs() {
