@@ -61,7 +61,13 @@
   };
 
   let allCars = [], filteredCars = [], loaded = false;
-  let brandActive = new Set(), bodyActive = new Set();
+  let brandActive = new Set(), bodyActive = new Set(), countryActive = new Set();
+
+  /* ── Accordion Toggle ── */
+  window.evsToggleSection = function(btn) {
+    const section = btn.parentElement;
+    section.classList.toggle('collapsed');
+  };
 
   /* ── CSV ── */
   function parseCSVLine(line) {
@@ -230,14 +236,35 @@
   function renderChips() {
     const brands = [...new Set(allCars.map(c => c.brand))].sort();
     const types  = [...new Set(allCars.map(c => (c.bodyType||'').split('/')[0].trim()).filter(Boolean))].sort();
+    const countries = [...new Set(allCars.map(c => c.country).filter(Boolean))].sort();
 
+    // Brand chips
     const bc = document.getElementById('evs-brand-chips');
     if (bc) {
       bc.innerHTML = brands.map(b =>
-        `<span class="evs-chip active" data-brand="${b}" onclick="evsToggleBrand('${b}')">${FLAGS[b]||''} ${b}</span>`
+        `<span class="evs-chip active" data-brand="${b}" onclick="evsToggleBrand('${b}')">
+          <span class="evs-chip-flag">${FLAGS[b]||'🌐'}</span> ${b}
+        </span>`
       ).join('');
       brandActive = new Set(brands);
     }
+
+    // Country chips
+    const cc = document.getElementById('evs-country-chips');
+    if (cc) {
+      const countryFlags = {
+        'จีน': '🇨🇳', 'สหรัฐอเมริกา': '🇺🇸', 'เยอรมนี': '🇩🇪', 'ญี่ปุ่น': '🇯🇵',
+        'เกาหลีใต้': '🇰🇷', 'สวีเดน': '🇸🇪', 'อังกฤษ': '🇬🇧', 'อิตาลี': '🇮🇹'
+      };
+      cc.innerHTML = countries.map(c =>
+        `<span class="evs-chip active" data-country="${c}" onclick="evsToggleCountry('${c}')">
+          <span class="evs-chip-flag">${countryFlags[c]||'🌐'}</span> ${c}
+        </span>`
+      ).join('');
+      countryActive = new Set(countries);
+    }
+
+    // Body type chips
     const tc = document.getElementById('evs-body-chips');
     if (tc) {
       tc.innerHTML = types.map(t =>
@@ -258,6 +285,11 @@
     document.querySelectorAll(`[data-body="${t}"]`).forEach(el => el.classList.toggle('active', bodyActive.has(t)));
     evsApply();
   };
+  window.evsToggleCountry = function(c) {
+    if (countryActive.has(c)) countryActive.delete(c); else countryActive.add(c);
+    document.querySelectorAll(`[data-country="${c}"]`).forEach(el => el.classList.toggle('active', countryActive.has(c)));
+    evsApply();
+  };
 
   function evsApply() {
     const q    = (document.getElementById('evs-search')?.value || '').toLowerCase();
@@ -268,6 +300,7 @@
     filteredCars = allCars.filter(c => {
       if (q && !`${c.brand} ${c.model} ${c.sub}`.toLowerCase().includes(q)) return false;
       if (!brandActive.has(c.brand)) return false;
+      if (c.country && countryActive.size && !countryActive.has(c.country)) return false;
       const bt = (c.bodyType || '').split('/')[0].trim();
       if (bt && bodyActive.size && !bodyActive.has(bt)) return false;
       if (c.priceNum > 0 && (c.priceNum < pMin || c.priceNum > pMax)) return false;
@@ -291,8 +324,10 @@
     if (document.getElementById('evs-sort')) document.getElementById('evs-sort').value = 'default';
     const brands = [...new Set(allCars.map(c => c.brand))];
     const types  = [...new Set(allCars.map(c => (c.bodyType||'').split('/')[0].trim()).filter(Boolean))];
+    const countries = [...new Set(allCars.map(c => c.country).filter(Boolean))];
     brandActive = new Set(brands);
     bodyActive  = new Set(types);
+    countryActive = new Set(countries);
     document.querySelectorAll('.evs-chip').forEach(el => el.classList.add('active'));
     evsApply();
   };
@@ -442,7 +477,7 @@
     document.getElementById('evs-grid').style.display = 'none';
     document.getElementById('evs-detail').style.display = 'block';
     document.getElementById('evs-toolbar')?.style && (document.getElementById('evs-toolbar').style.display = 'none');
-    document.getElementById('evs-filters-bar')?.style && (document.getElementById('evs-filters-bar').style.display = 'none');
+    document.getElementById('evs-sidebar')?.style && (document.getElementById('evs-sidebar').style.display = 'none');
     document.querySelector('.evspec-root')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -450,9 +485,9 @@
     document.getElementById('evs-detail').style.display = 'none';
     document.getElementById('evs-grid').style.display = 'grid';
     const tb = document.getElementById('evs-toolbar');
-    const fb = document.getElementById('evs-filters-bar');
+    const sb = document.getElementById('evs-sidebar');
     if (tb) tb.style.display = '';
-    if (fb) fb.style.display = '';
+    if (sb) sb.style.display = '';
   };
 
   /* ── EVENT LISTENERS (lazy bind) ── */

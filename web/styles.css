@@ -394,20 +394,176 @@ header.container {
 
 .evspec-root { padding-bottom: 40px; }
 
+/* ═══ Sidebar Layout ═══ */
+.evs-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Sidebar */
+.evs-sidebar {
+  background: var(--bg);
+  border: 1px solid var(--line-dark);
+  border-radius: 12px;
+  padding: 16px;
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+.evs-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.evs-sidebar-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Filter Sections (Accordion) */
+.evs-filter-section {
+  border-bottom: 1px solid var(--line);
+}
+.evs-filter-section:last-child {
+  border-bottom: none;
+}
+.evs-filter-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: inherit;
+}
+.evs-filter-toggle:hover {
+  color: var(--accent);
+}
+.evs-toggle-icon {
+  font-size: 10px;
+  transition: transform 0.2s;
+  color: var(--muted);
+}
+.evs-filter-section.collapsed .evs-toggle-icon {
+  transform: rotate(-90deg);
+}
+.evs-filter-section.collapsed .evs-filter-content {
+  display: none;
+}
+.evs-filter-content {
+  padding-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Chips in Sidebar */
+.evs-chip {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--line-dark);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.evs-chip:hover {
+  background: var(--bg-alt);
+}
+.evs-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+.evs-chip-flag {
+  font-size: 14px;
+}
+
+/* Price Filter */
+.evs-price-filter {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+}
+.evs-price-in {
+  background: var(--bg);
+  border: 1px solid var(--line-dark);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  width: 100%;
+  max-width: 90px;
+  outline: none;
+}
+.evs-price-in:focus { border-color: var(--accent); }
+.evs-price-sep {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Reset Button */
+.evs-reset-btn {
+  background: var(--bg-alt);
+  border: 1px solid var(--line-dark);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.evs-reset-btn:hover { 
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+/* Main Content */
+.evs-main {
+  min-width: 0;
+}
+
 /* Toolbar */
 .evs-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
 }
 .evs-toolbar-left {
   display: flex;
   gap: 10px;
   align-items: center;
-  flex-wrap: wrap;
+}
+.evs-toolbar-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 .evs-search-box {
   position: relative;
@@ -416,7 +572,7 @@ header.container {
 }
 .evs-search-box svg {
   position: absolute;
-  left: 10px;
+  left: 12px;
   color: var(--muted);
   pointer-events: none;
 }
@@ -424,12 +580,12 @@ header.container {
   background: var(--bg);
   border: 1px solid var(--line-dark);
   color: var(--text);
-  border-radius: 999px;
-  padding: 8px 14px 8px 30px;
-  font-size: 13px;
+  border-radius: 8px;
+  padding: 10px 14px 10px 34px;
+  font-size: 14px;
   font-family: inherit;
   outline: none;
-  width: 220px;
+  width: 280px;
   transition: border-color 0.15s;
 }
 .evs-search-input:focus { border-color: var(--accent); }
@@ -437,89 +593,33 @@ header.container {
   background: var(--bg);
   border: 1px solid var(--line-dark);
   color: var(--text);
-  border-radius: 999px;
-  padding: 8px 14px;
+  border-radius: 8px;
+  padding: 10px 14px;
   font-size: 13px;
   font-family: inherit;
   outline: none;
   cursor: pointer;
 }
 .evs-count {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--muted);
   white-space: nowrap;
 }
-.evs-count b { color: var(--text); }
+.evs-count b { color: var(--text); font-weight: 700; }
 
-/* Filters bar */
-.evs-filters-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: flex-start;
-  background: var(--bg-alt);
-  border: 1px solid var(--line-dark);
-  border-radius: 12px;
-  padding: 14px 18px;
-  margin-bottom: 18px;
+/* Responsive Sidebar */
+@media (max-width: 900px) {
+  .evs-layout {
+    grid-template-columns: 1fr;
+  }
+  .evs-sidebar {
+    position: static;
+    order: 1;
+  }
+  .evs-main {
+    order: 2;
+  }
 }
-.evs-filter-group {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-.evs-filter-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  margin-right: 2px;
-}
-.evs-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.evs-chip {
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  border: 1px solid var(--line-dark);
-  background: var(--bg);
-  color: var(--muted);
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.15s;
-}
-.evs-chip.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #ffffff;
-}
-.evs-price-in {
-  background: var(--bg);
-  border: 1px solid var(--line-dark);
-  color: var(--text);
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 12px;
-  font-family: inherit;
-  width: 100px;
-  outline: none;
-  text-align: center;
-}
-.evs-price-in:focus { border-color: var(--accent); }
-.evs-reset-btn {
-  background: var(--bg);
-  border: 1px solid var(--line-dark);
-  color: var(--muted);
-  border-radius: 999px;
-  padding: 5px 12px;
-  font-size: 12px;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.evs-reset-btn:hover { background: var(--bg-alt); color: var(--text); }
 
 /* Loading */
 .evs-loading {

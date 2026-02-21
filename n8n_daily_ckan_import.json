@@ -1,0 +1,176 @@
+{
+  "name": "Daily CKAN DLT Import",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily 6 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [100, 300],
+      "notes": "Trigger ทุกวัน 06:00 น."
+    },
+    {
+      "parameters": {
+        "functionCode": "// กำหนดปี พ.ศ. และเดือนที่จะดึง\nconst now = new Date();\nconst yearBE = now.getFullYear() + 543;\nconst month = String(now.getMonth() + 1).padStart(2, '0');\n\n// Dataset ID\nconst datasetId = 'stat_1_1_01_first_regis_vehicles_car';\n\n// สร้าง URL สำหรับดึงข้อมูล\nconst baseUrl = 'https://gdcatalog.dlt.go.th/dataset';\n\nreturn [{\n  json: {\n    datasetId,\n    yearBE,\n    month,\n    resourceName: `${datasetId}_mm_${yearBE}_${month}.csv`,\n    apiUrl: `${baseUrl}/${datasetId}/resource_download`\n  }\n}];"
+      },
+      "id": "prepare-params",
+      "name": "Prepare Parameters",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 300],
+      "notes": "คำนวณปี/เดือนปัจจุบัน"
+    },
+    {
+      "parameters": {
+        "url": "=https://gdcatalog.dlt.go.th/api/3/action/package_show?id={{ $json.datasetId }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "get-dataset-info",
+      "name": "Get Dataset Info",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 300],
+      "notes": "ดึงรายการ resources จาก CKAN"
+    },
+    {
+      "parameters": {
+        "functionCode": "const result = items[0].json.result;\nconst resources = result.resources || [];\n\n// หา resource ล่าสุด (เรียงตามชื่อ desc)\nconst csvResources = resources\n  .filter(r => r.format === 'CSV' && r.name.includes('_mm_'))\n  .sort((a, b) => b.name.localeCompare(a.name));\n\nif (csvResources.length === 0) {\n  throw new Error('No CSV resources found');\n}\n\n// เอา resource ล่าสุด\nconst latest = csvResources[0];\n\n// Parse ปี/เดือน จากชื่อไฟล์\nconst match = latest.name.match(/_mm_(\\d{4})_(\\d{2})/);\nconst yearBE = match ? parseInt(match[1]) : null;\nconst monthNum = match ? parseInt(match[2]) : null;\n\nconst monthNames = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];\n\nreturn [{\n  json: {\n    resourceId: latest.id,\n    resourceName: latest.name,\n    downloadUrl: latest.url,\n    yearBE,\n    monthNum,\n    monthTH: monthNames[monthNum] || '',\n    lastModified: latest.last_modified\n  }\n}];"
+      },
+      "id": "find-latest-resource",
+      "name": "Find Latest Resource",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300],
+      "notes": "หา CSV ล่าสุด"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.downloadUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "id": "download-csv",
+      "name": "Download CSV",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 300],
+      "notes": "ดาวน์โหลดไฟล์ CSV"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "options": {
+          "encoding": "utf8"
+        }
+      },
+      "id": "parse-csv",
+      "name": "Parse CSV",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 4.4,
+      "position": [1100, 300],
+      "notes": "แปลง CSV เป็น JSON"
+    },
+    {
+      "parameters": {
+        "functionCode": "// แปลงข้อมูลให้ตรงกับ schema\nconst rows = items.map(item => {\n  const d = item.json;\n  return {\n    year_be: parseInt(d['ปี พ.ศ.'] || d.year_be),\n    month_th: d['เดือน'] || d.month_th,\n    vehicle_type: d['ประเภทรถ'] || d.vehicle_type,\n    brand: d['ยี่ห้อ'] || d.brand,\n    model: d['รุ่น'] || d.model,\n    count: parseInt(d['จำนวน'] || d.count || 0)\n  };\n}).filter(r => r.count > 0);\n\nreturn [{\n  json: {\n    rows,\n    totalRows: rows.length,\n    yearBE: rows[0]?.year_be,\n    monthTH: rows[0]?.month_th\n  }\n}];"
+      },
+      "id": "transform-data",
+      "name": "Transform Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1300, 300],
+      "notes": "แปลง column names"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://rayaztyesqxnbsxpvuvl.supabase.co/rest/v1/rpc/rpc_ingest_state_data",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"p_bucket\": \"ckan-import\",\n  \"p_object_path\": \"{{ $('Find Latest Resource').item.json.resourceName }}\",\n  \"p_file_sha256\": \"{{ $runIndex }}-{{ Date.now() }}\",\n  \"p_rows\": {{ JSON.stringify($json.rows) }}\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "call-supabase-rpc",
+      "name": "Insert to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1500, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "supabase-service-role",
+          "name": "Supabase Service Role"
+        }
+      },
+      "notes": "เรียก RPC function"
+    },
+    {
+      "parameters": {
+        "functionCode": "const result = items[0].json;\nconst transform = $('Transform Data').first().json;\n\nreturn [{\n  json: {\n    success: true,\n    message: `Imported ${transform.totalRows} rows for ${transform.monthTH} ${transform.yearBE}`,\n    runId: result.run_id,\n    rowCount: transform.totalRows,\n    yearBE: transform.yearBE,\n    monthTH: transform.monthTH,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "format-result",
+      "name": "Format Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1700, 300],
+      "notes": "สรุปผล"
+    }
+  ],
+  "connections": {
+    "Daily 6 AM": {
+      "main": [[{"node": "Prepare Parameters", "type": "main", "index": 0}]]
+    },
+    "Prepare Parameters": {
+      "main": [[{"node": "Get Dataset Info", "type": "main", "index": 0}]]
+    },
+    "Get Dataset Info": {
+      "main": [[{"node": "Find Latest Resource", "type": "main", "index": 0}]]
+    },
+    "Find Latest Resource": {
+      "main": [[{"node": "Download CSV", "type": "main", "index": 0}]]
+    },
+    "Download CSV": {
+      "main": [[{"node": "Parse CSV", "type": "main", "index": 0}]]
+    },
+    "Parse CSV": {
+      "main": [[{"node": "Transform Data", "type": "main", "index": 0}]]
+    },
+    "Transform Data": {
+      "main": [[{"node": "Insert to Supabase", "type": "main", "index": 0}]]
+    },
+    "Insert to Supabase": {
+      "main": [[{"node": "Format Result", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "timezone": "Asia/Bangkok"
+  },
+  "tags": [
+    {"name": "imod-drive"},
+    {"name": "ckan"},
+    {"name": "scheduled"}
+  ]
+}
