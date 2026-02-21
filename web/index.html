@@ -3,27 +3,28 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>iMoD Drive • สถิติจดทะเบียนรถยนต์ไทย</title>
+    <title>iMoD Drive • ข้อมูลรถยนต์ไฟฟ้าในไทย</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <header class="container">
-      <div class="brand">
-        <div class="brand__title">iMoD Drive</div>
-        <div class="brand__subtitle">สถิติจดทะเบียนรถยนต์ไทย (Supabase)</div>
-      </div>
-      <nav class="tabs" aria-label="เมนู">
-        <button class="tab tab--active" data-tab="evspec">🚗 สเปครถ EV</button>
-        <div class="tab-dropdown">
-          <button class="tab tab-dropdown-toggle">📊 สถิติรถ <span class="dropdown-arrow">▼</span></button>
-          <div class="tab-dropdown-menu">
-            <button class="tab-dropdown-item" data-tab="overview">ภาพรวมตลาด</button>
-            <button class="tab-dropdown-item" data-tab="explore">สำรวจข้อมูล</button>
-            <button class="tab-dropdown-item" data-tab="upload">อัปโหลด</button>
+    <header class="global-header">
+      <div class="header-inner">
+        <a href="./" class="brand" onclick="evsShowList(); return true;">
+          <span class="brand__title">iMoD Drive</span>
+        </a>
+        <nav class="tabs" aria-label="เมนู">
+          <button class="tab tab--active" data-tab="evspec">🚗 สเปครถ EV</button>
+          <div class="tab-dropdown">
+            <button class="tab tab-dropdown-toggle">📊 สถิติรถ <span class="dropdown-arrow">▼</span></button>
+            <div class="tab-dropdown-menu">
+              <button class="tab-dropdown-item" data-tab="overview">ภาพรวมตลาด</button>
+              <button class="tab-dropdown-item" data-tab="explore">สำรวจข้อมูล</button>
+              <button class="tab-dropdown-item" data-tab="upload">อัปโหลด</button>
+            </div>
           </div>
-        </div>
-        <button class="tab" data-tab="about">เกี่ยวกับ</button>
-      </nav>
+          <button class="tab" data-tab="about">เกี่ยวกับ</button>
+        </nav>
+      </div>
     </header>
 
     <main class="container main-stats-container hidden">

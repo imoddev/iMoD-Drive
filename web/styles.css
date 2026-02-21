@@ -44,23 +44,35 @@ a:hover {
   margin: 0 auto;
 }
 
-header.container {
-  padding: 24px 0 12px;
+/* Global Header */
+.global-header {
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px 24px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
-
+.brand {
+  text-decoration: none;
+  color: var(--text);
+}
+.brand:hover {
+  text-decoration: none;
+}
 .brand__title {
   font-size: 20px;
   font-weight: 800;
-  letter-spacing: 0.2px;
-}
-.brand__subtitle {
-  margin-top: 2px;
-  font-size: 13px;
-  color: var(--muted);
+  letter-spacing: -0.3px;
+  color: var(--text);
 }
 
 .tabs {
@@ -427,7 +439,7 @@ header.container {
   gap: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 24px 24px;
 }
 
 /* Sidebar */
@@ -820,14 +832,13 @@ header.container {
 
 /* Detail - Full Width */
 .evs-detail-fullwidth {
-  padding: 20px 16px;
-  max-width: 1200px;
+  padding: 24px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 .evs-detail-fullwidth .container {
   width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
+  max-width: 100%;
 }
 .evs-back-btn {
   display: inline-flex;
