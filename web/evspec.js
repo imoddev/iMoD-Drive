@@ -1,21 +1,63 @@
 /**
  * evspec.js — EV Spec Viewer for data.iphonemod.net
- * Tab: "สเปครถ EV" | Data: Google Sheets CSV
+ * Tab: "สเปครถ EV" | Data: Google Sheets CSV (multi-tab)
  * iMoD Drive © 2026
  */
 
 (function () {
-  const SHEET_URL =
-    'https://docs.google.com/spreadsheets/d/1SphsQR8V9eKcWzonLXjPgXZcmyKids0WnYi_B-MiRl0/export?format=csv&gid=0';
+  const SHEET_ID = '1SphsQR8V9eKcWzonLXjPgXZcmyKids0WnYi_B-MiRl0';
+  
+  // Brand tabs: name → gid
+  const BRAND_TABS = {
+    'BYD': 1248635741,
+    'MG': 537545962,
+    'Volvo': 684902357,
+    'Zeekr': 816947032,
+    'Tesla': 660597803,
+    'GWM': 40163670,
+    'Deepal': 1021728758,
+    'AVATR': 2036383534,
+    'HYPTEC': 1258340992,
+    'Xpeng': 1759530012,
+    'AION': 875112136,
+    'Mercedes-Benz': 102650194,
+    'Kia': 596321324,
+    'Hyundai': 346696962,
+    'BMW': 1958764800,
+    'Audi': 145641940,
+    'Porsche': 979936496,
+    'Toyota': 1262403275,
+    'Lexus': 431039414,
+    'Honda': 414822744,
+    'Nissan': 1773433033,
+    'Lotus': 1504159861,
+    'MINI': 57731534,
+    'JAECOO-OMODA': 989044380,
+    'Denza': 1293661774,
+    'Maserati': 1062914600,
+    'Lumin': 724272663,
+    'Wuling': 1166005171,
+    'GAC': 2047597204,
+  };
 
   const FLAGS = {
     BYD: '🇨🇳', GWM: '🇨🇳', Volvo: '🇸🇪', MG: '🇨🇳',
     Tesla: '🇺🇸', Toyota: '🇯🇵', Lexus: '🇯🇵', BMW: '🇩🇪', MAXUS: '🇨🇳',
+    Zeekr: '🇨🇳', Deepal: '🇨🇳', AVATR: '🇨🇳', HYPTEC: '🇨🇳', Xpeng: '🇨🇳',
+    AION: '🇨🇳', 'Mercedes-Benz': '🇩🇪', Kia: '🇰🇷', Hyundai: '🇰🇷',
+    Audi: '🇩🇪', Porsche: '🇩🇪', Honda: '🇯🇵', Nissan: '🇯🇵',
+    Lotus: '🇬🇧', MINI: '🇬🇧', 'JAECOO-OMODA': '🇨🇳', Denza: '🇨🇳',
+    Maserati: '🇮🇹', Lumin: '🇨🇳', Wuling: '🇨🇳', GAC: '🇨🇳',
   };
   const COUNTRIES = {
     BYD: 'จีน', GWM: 'จีน', Volvo: 'สวีเดน', MG: 'จีน',
     Tesla: 'สหรัฐอเมริกา', Toyota: 'ญี่ปุ่น', Lexus: 'ญี่ปุ่น',
-    BMW: 'เยอรมนี', MAXUS: 'จีน',
+    BMW: 'เยอรมนี', MAXUS: 'จีน', Zeekr: 'จีน', Deepal: 'จีน',
+    AVATR: 'จีน', HYPTEC: 'จีน', Xpeng: 'จีน', AION: 'จีน',
+    'Mercedes-Benz': 'เยอรมนี', Kia: 'เกาหลีใต้', Hyundai: 'เกาหลีใต้',
+    Audi: 'เยอรมนี', Porsche: 'เยอรมนี', Honda: 'ญี่ปุ่น', Nissan: 'ญี่ปุ่น',
+    Lotus: 'อังกฤษ', MINI: 'อังกฤษ', 'JAECOO-OMODA': 'จีน', Denza: 'จีน',
+    Maserati: 'อิตาลี', Lumin: 'จีน', Wuling: 'จีน', GAC: 'จีน',
   };
 
   let allCars = [], filteredCars = [], loaded = false;
@@ -59,109 +101,128 @@
     return '฿' + num.toLocaleString('th-TH');
   }
 
-  /* ── LOAD ── */
-  async function loadData() {
-    const res = await fetch(SHEET_URL);
-    const text = await res.text();
-    const rows = parseCSV(text);
+  /* ── LOAD (multi-tab) ── */
+  function getSheetURL(gid) {
+    return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
+  }
 
-    const brandRow  = rows[0];
-    const modelRow  = findRow(rows, 'รุ่น') || rows[3];
-    const subRow    = findRow(rows, 'รุ่นย่อย') || rows[4];
-    const rangeRow  = findRowP(rows, 'ระยะทางสูงสุด (กม.)');
-    const accelRow  = findRow(rows, 'อัตราเร่ง 0-100 (กม./ชม.)');
-    const accel2Row = findRowP(rows, 'อัตราเร่ง 0 - 100');
-    const motorKwR  = findRow(rows, 'กำลังมอเตอร์ (kw)') || findRowP(rows, 'กำลังมอเตอร์');
-    const maxPowR   = findRowP(rows, 'กำลังสูงสุด');
-    const hpRow     = findRowP(rows, 'แรงม้า (hp)') || findRowP(rows, 'แรงม้า');
-    const battRow   = findRowP(rows, 'ขนาดแบตเตอรี่');
-    const dcRow     = findRow(rows, 'การชาร์จ dc') || findRowP(rows, 'dc สูงสุด');
-    const acRow     = findRow(rows, 'การชาร์จ ac') || findRowP(rows, 'ac สูงสุด');
-    const priceRow  = findRowP(rows, 'ราคาเปิดตัวในไทย');
-    const bodyRows  = rows.filter(r => r[0] && r[0].trim() === 'ประเภทตัวถัง');
-    const bodyRow   = bodyRows[0];
-    const segRow    = findRowP(rows, 'segment');
-    const lenRow    = findRowP(rows, 'ความยาวตัวรถ');
-    const widRow    = findRowP(rows, 'ความกว้างตัวรถ');
-    const htRow     = findRowP(rows, 'ความสูงตัวรถ');
-    const wbRow     = findRowP(rows, 'ระยะฐานล้อ');
-    const gcRow     = findRowP(rows, 'ความสูงใต้ท้องรถ (มม.)');
-    const seatsRow  = findRowP(rows, 'จำนวนที่นั่ง');
-    const doorsRow  = findRowP(rows, 'จำนวนประตู');
-    const wgtRow    = findRowP(rows, 'น้ำหนักรถเปล่า');
-    const trunkRow  = findRowP(rows, 'พื้นที่เก็บสัมภาระท้ายรถ');
-    const mtrTypeR  = findRowP(rows, 'ประเภทมอเตอร์');
-    const driveRow  = findRowP(rows, 'ระบบขับเคลื่อน');
-    const torqRow   = findRowP(rows, 'แรงบิดสูงสุด');
-    const topSpRow  = findRowP(rows, 'ความเร็วสูงสุด');
-    const battTypeR = findRowP(rows, 'ประเภทแบตเตอรี่');
-    const v2lRow    = findRowP(rows, 'v2l');
-    const consRow   = findRowP(rows, 'อัตราการบริโภค');
-    const capRow    = findRowP(rows, 'ความจุแบตเตอรี่สูงสุด');
-    const turnRow   = findRowP(rows, 'รัศมีวงเลี้ยว');
-    const cycleRow  = findRowP(rows, 'รอบการชาร์จ');
-    const trackRow  = findRowP(rows, 'ระยะห่างล้อ');
-    const frtRow    = findRowP(rows, 'พื้นที่เก็บสัมภาระด้านหน้า');
-    const foldRow   = findRowP(rows, 'ความจุพื้นที่เก็บสัมภาระเมื่อพับ');
+  function getRowValue(rows, label) {
+    const lo = label.toLowerCase();
+    const row = rows.find(r => r[0] && r[0].trim().toLowerCase().includes(lo));
+    return row || null;
+  }
 
-    const numCols = Math.max(...rows.map(r => r.length));
-    let prevBrand = '';
-    const cars = [];
+  async function loadBrandData(brand, gid) {
+    try {
+      const res = await fetch(getSheetURL(gid));
+      const text = await res.text();
+      const rows = parseCSV(text);
+      if (rows.length < 3) return [];
 
-    for (let col = 1; col < numCols; col++) {
-      const rawBrand = brandRow[col]?.trim();
-      const brand = rawBrand || prevBrand;
-      if (rawBrand) prevBrand = rawBrand;
-      const model = modelRow?.[col]?.trim();
-      if (!brand || !model || model === 'รุ่น') continue;
+      // New structure: Column A = spec labels, Columns B+ = model data
+      // Row 0 = สเปก header with model names
+      const headerRow = rows[0];
+      const rangeRow  = getRowValue(rows, 'ระยะทางสูงสุด');
+      const accelRow  = getRowValue(rows, 'อัตราเร่ง');
+      const motorKwR  = getRowValue(rows, 'กำลังมอเตอร์');
+      const hpRow     = getRowValue(rows, 'แรงม้า');
+      const battRow   = getRowValue(rows, 'ขนาดแบตเตอรี่');
+      const dcRow     = getRowValue(rows, 'การชาร์จ DC') || getRowValue(rows, 'DC');
+      const acRow     = getRowValue(rows, 'การชาร์จ AC') || getRowValue(rows, 'AC');
+      const priceRow  = getRowValue(rows, 'ราคาเปิดตัว') || getRowValue(rows, 'ราคา');
+      const bodyRow   = getRowValue(rows, 'ประเภทตัวถัง');
+      const segRow    = getRowValue(rows, 'segment') || getRowValue(rows, 'เซกเมนต์');
+      const lenRow    = getRowValue(rows, 'ความยาว');
+      const widRow    = getRowValue(rows, 'ความกว้าง');
+      const htRow     = getRowValue(rows, 'ความสูงตัวรถ') || getRowValue(rows, 'ความสูง');
+      const wbRow     = getRowValue(rows, 'ระยะฐานล้อ');
+      const gcRow     = getRowValue(rows, 'ความสูงใต้ท้อง') || getRowValue(rows, 'Ground');
+      const seatsRow  = getRowValue(rows, 'จำนวนที่นั่ง');
+      const doorsRow  = getRowValue(rows, 'จำนวนประตู');
+      const wgtRow    = getRowValue(rows, 'น้ำหนัก');
+      const trunkRow  = getRowValue(rows, 'พื้นที่เก็บสัมภาระ') || getRowValue(rows, 'ท้ายรถ');
+      const mtrTypeR  = getRowValue(rows, 'ประเภทมอเตอร์');
+      const driveRow  = getRowValue(rows, 'ระบบขับเคลื่อน');
+      const torqRow   = getRowValue(rows, 'แรงบิด');
+      const topSpRow  = getRowValue(rows, 'ความเร็วสูงสุด');
+      const battTypeR = getRowValue(rows, 'ประเภทแบตเตอรี่');
+      const v2lRow    = getRowValue(rows, 'v2l');
 
-      const sub      = subRow?.[col]?.trim() || '';
-      const range    = rangeRow?.[col]?.trim() || '';
-      const priceStr = priceRow?.[col]?.trim() || '';
-      const hp       = hpRow?.[col]?.trim() || '';
-      const batt     = battRow?.[col]?.trim() || '';
-      const dc       = dcRow?.[col]?.trim() || '';
-      const ac       = acRow?.[col]?.trim() || '';
-      const accel    = accelRow?.[col]?.trim() || accel2Row?.[col]?.trim() || '';
-      const bodyType = bodyRow?.[col]?.trim() || '';
-      if (!priceStr && !hp && !range && !batt) continue;
+      const cars = [];
+      const numCols = Math.max(...rows.map(r => r.length));
 
-      cars.push({
-        id: col, brand, model, sub,
-        range, rangeNum: pNum(range),
-        hp, hpNum: pNum(hp),
-        batt, battNum: pNum(batt),
-        dc, ac, accel, accelNum: pNum(accel),
-        priceStr, priceNum: pPrice(priceStr),
-        bodyType,
-        segment:   segRow?.[col]?.trim() || '',
-        length:    lenRow?.[col]?.trim() || '',
-        width:     widRow?.[col]?.trim() || '',
-        height:    htRow?.[col]?.trim() || '',
-        wheelbase: wbRow?.[col]?.trim() || '',
-        gc:        gcRow?.[col]?.trim() || '',
-        seats:     seatsRow?.[col]?.trim() || '',
-        doors:     doorsRow?.[col]?.trim() || '',
-        weight:    wgtRow?.[col]?.trim() || '',
-        trunk:     trunkRow?.[col]?.trim() || '',
-        motorType: mtrTypeR?.[col]?.trim() || '',
-        drive:     driveRow?.[col]?.trim() || '',
-        torque:    torqRow?.[col]?.trim() || '',
-        topSpeed:  topSpRow?.[col]?.trim() || '',
-        battType:  battTypeR?.[col]?.trim() || '',
-        v2l:       v2lRow?.[col]?.trim() || '',
-        consumption: consRow?.[col]?.trim() || '',
-        cap:       capRow?.[col]?.trim() || '',
-        turning:   turnRow?.[col]?.trim() || '',
-        motorKw:   motorKwR?.[col]?.trim() || maxPowR?.[col]?.trim() || '',
-        cycles:    cycleRow?.[col]?.trim() || '',
-        track:     trackRow?.[col]?.trim() || '',
-        frtTrunk:  frtRow?.[col]?.trim() || '',
-        fold:      foldRow?.[col]?.trim() || '',
-        flag:      FLAGS[brand] || '🌐',
-        country:   COUNTRIES[brand] || '',
-      });
+      for (let col = 1; col < numCols; col++) {
+        const modelName = headerRow[col]?.trim();
+        if (!modelName || modelName === 'สเปก') continue;
+
+        const range    = rangeRow?.[col]?.trim() || '';
+        const priceStr = priceRow?.[col]?.trim() || '';
+        const hp       = hpRow?.[col]?.trim() || '';
+        const batt     = battRow?.[col]?.trim() || '';
+        const dc       = dcRow?.[col]?.trim() || '';
+        const ac       = acRow?.[col]?.trim() || '';
+        const accel    = accelRow?.[col]?.trim() || '';
+        const bodyType = bodyRow?.[col]?.trim() || '';
+
+        // Skip empty columns
+        if (!priceStr && !hp && !range && !batt && !modelName.includes(brand)) continue;
+
+        // Parse model name: "BYD Dolphin Standard Range" → model="Dolphin", sub="Standard Range"
+        let model = modelName.replace(brand, '').trim();
+        let sub = '';
+        const parts = model.split(/\s+/);
+        if (parts.length > 1) {
+          model = parts[0];
+          sub = parts.slice(1).join(' ');
+        }
+
+        cars.push({
+          id: `${brand}-${col}`,
+          brand,
+          model: model || modelName,
+          sub,
+          range, rangeNum: pNum(range),
+          hp, hpNum: pNum(hp),
+          batt, battNum: pNum(batt),
+          dc, ac, accel, accelNum: pNum(accel),
+          priceStr, priceNum: pPrice(priceStr),
+          bodyType,
+          segment:   segRow?.[col]?.trim() || '',
+          length:    lenRow?.[col]?.trim() || '',
+          width:     widRow?.[col]?.trim() || '',
+          height:    htRow?.[col]?.trim() || '',
+          wheelbase: wbRow?.[col]?.trim() || '',
+          gc:        gcRow?.[col]?.trim() || '',
+          seats:     seatsRow?.[col]?.trim() || '',
+          doors:     doorsRow?.[col]?.trim() || '',
+          weight:    wgtRow?.[col]?.trim() || '',
+          trunk:     trunkRow?.[col]?.trim() || '',
+          motorType: mtrTypeR?.[col]?.trim() || '',
+          drive:     driveRow?.[col]?.trim() || '',
+          torque:    torqRow?.[col]?.trim() || '',
+          topSpeed:  topSpRow?.[col]?.trim() || '',
+          battType:  battTypeR?.[col]?.trim() || '',
+          v2l:       v2lRow?.[col]?.trim() || '',
+          motorKw:   motorKwR?.[col]?.trim() || '',
+          flag:      FLAGS[brand] || '🌐',
+          country:   COUNTRIES[brand] || '',
+        });
+      }
+      return cars;
+    } catch (err) {
+      console.warn(`[evspec] Failed to load ${brand}:`, err);
+      return [];
     }
+  }
+
+  async function loadData() {
+    const allCarsPromises = Object.entries(BRAND_TABS).map(([brand, gid]) => 
+      loadBrandData(brand, gid)
+    );
+    const results = await Promise.all(allCarsPromises);
+    const cars = results.flat();
+    // Assign unique numeric ids
+    cars.forEach((c, i) => c.id = i + 1);
     return cars;
   }
 
