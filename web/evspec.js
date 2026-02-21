@@ -243,7 +243,7 @@
     if (bc) {
       bc.innerHTML = brands.map(b =>
         `<span class="evs-chip active" data-brand="${b}" onclick="evsToggleBrand('${b}')">
-          <span class="evs-chip-flag">${FLAGS[b]||'🌐'}</span> ${b}
+          <span class="evs-chip-text"><span class="evs-chip-flag">${FLAGS[b]||'🌐'}</span> ${b}</span>
         </span>`
       ).join('');
       brandActive = new Set(brands);
@@ -258,7 +258,7 @@
       };
       cc.innerHTML = countries.map(c =>
         `<span class="evs-chip active" data-country="${c}" onclick="evsToggleCountry('${c}')">
-          <span class="evs-chip-flag">${countryFlags[c]||'🌐'}</span> ${c}
+          <span class="evs-chip-text"><span class="evs-chip-flag">${countryFlags[c]||'🌐'}</span> ${c}</span>
         </span>`
       ).join('');
       countryActive = new Set(countries);
@@ -268,7 +268,7 @@
     const tc = document.getElementById('evs-body-chips');
     if (tc) {
       tc.innerHTML = types.map(t =>
-        `<span class="evs-chip active" data-body="${t}" onclick="evsToggleBody('${t}')">${t}</span>`
+        `<span class="evs-chip active" data-body="${t}" onclick="evsToggleBody('${t}')"><span class="evs-chip-text">${t}</span></span>`
       ).join('');
       bodyActive = new Set(types);
     }

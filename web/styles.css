@@ -525,6 +525,11 @@ a:hover {
   align-items: center;
   justify-content: space-between;
   gap: 6px;
+  text-align: left;
+}
+.evs-chip-text {
+  flex: 1;
+  text-align: left;
 }
 .evs-chip:hover {
   background: #e0e0e0;
