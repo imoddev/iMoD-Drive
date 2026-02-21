@@ -1,14 +1,19 @@
 :root {
-  --bg: #0b0f14;
-  --card: #101826;
-  --muted: #a7b4c6;
-  --text: #eaf1ff;
-  --line: rgba(255, 255, 255, 0.08);
-  --accent: #4aa3ff;
-  --accent2: #7c5cff;
-  --danger: #ff5a6a;
-  --ok: #41d18a;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --bg: #ffffff;
+  --bg-alt: #f8f9fa;
+  --card: #ffffff;
+  --card-alt: #f5f6f7;
+  --muted: #6b7280;
+  --text: #1f2937;
+  --text-light: #374151;
+  --line: rgba(0, 0, 0, 0.08);
+  --line-dark: rgba(0, 0, 0, 0.12);
+  --accent: #2563eb;
+  --accent2: #1d4ed8;
+  --danger: #dc2626;
+  --ok: #16a34a;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
   --radius: 14px;
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
@@ -22,9 +27,7 @@ body {
   margin: 0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
     "Segoe UI Emoji";
-  background: radial-gradient(1200px 600px at 10% 0%, rgba(74, 163, 255, 0.12), transparent 60%),
-    radial-gradient(900px 500px at 90% 10%, rgba(124, 92, 255, 0.12), transparent 55%),
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
 }
 
@@ -65,17 +68,22 @@ header.container {
   gap: 8px;
 }
 .tab {
-  border: 1px solid var(--line);
-  background: rgba(16, 24, 38, 0.6);
+  border: 1px solid var(--line-dark);
+  background: var(--bg);
   color: var(--text);
   padding: 10px 12px;
   border-radius: 999px;
   cursor: pointer;
   font-weight: 600;
+  transition: all 0.15s;
+}
+.tab:hover {
+  background: var(--bg-alt);
 }
 .tab--active {
-  background: linear-gradient(135deg, rgba(74, 163, 255, 0.25), rgba(124, 92, 255, 0.2));
-  border-color: rgba(74, 163, 255, 0.45);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
 }
 
 /* Dropdown Menu */
@@ -101,10 +109,10 @@ header.container {
   top: 100%;
   left: 0;
   margin-top: 4px;
-  background: rgba(16, 24, 38, 0.95);
-  border: 1px solid var(--line);
+  background: var(--bg);
+  border: 1px solid var(--line-dark);
   border-radius: 12px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-hover);
   min-width: 160px;
   z-index: 1000;
   overflow: hidden;
@@ -126,15 +134,15 @@ header.container {
   transition: background 0.15s;
 }
 .tab-dropdown-item:hover {
-  background: rgba(74, 163, 255, 0.15);
+  background: var(--bg-alt);
 }
 .tab-dropdown-item:not(:last-child) {
   border-bottom: 1px solid var(--line);
 }
 
 .card {
-  background: rgba(16, 24, 38, 0.72);
-  border: 1px solid var(--line);
+  background: var(--card);
+  border: 1px solid var(--line-dark);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
@@ -215,8 +223,8 @@ header.container {
 }
 .select,
 .input {
-  background: rgba(9, 13, 19, 0.65);
-  border: 1px solid var(--line);
+  background: var(--bg);
+  border: 1px solid var(--line-dark);
   color: var(--text);
   border-radius: 10px;
   padding: 10px 10px;
@@ -229,25 +237,31 @@ header.container {
 }
 .select:focus,
 .input:focus {
-  border-color: rgba(74, 163, 255, 0.6);
+  border-color: var(--accent);
 }
 
 .button {
-  border: 1px solid rgba(74, 163, 255, 0.45);
-  background: linear-gradient(135deg, rgba(74, 163, 255, 0.25), rgba(124, 92, 255, 0.2));
-  color: var(--text);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #ffffff;
   border-radius: 12px;
   padding: 11px 14px;
   cursor: pointer;
   font-weight: 800;
+  transition: all 0.15s;
 }
 .button:hover {
-  border-color: rgba(74, 163, 255, 0.75);
+  background: var(--accent2);
+  border-color: var(--accent2);
 }
 .button--secondary {
-  background: rgba(16, 24, 38, 0.72);
-  border-color: rgba(255, 255, 255, 0.14);
+  background: var(--bg);
+  border-color: var(--line-dark);
+  color: var(--text);
   font-weight: 800;
+}
+.button--secondary:hover {
+  background: var(--bg-alt);
 }
 
 .form {
@@ -283,10 +297,11 @@ header.container {
 .empty {
   margin-top: 12px;
   padding: 12px;
-  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border: 1px dashed var(--line-dark);
   border-radius: 12px;
   color: var(--muted);
   font-size: 13px;
+  background: var(--bg-alt);
 }
 .hidden {
   display: none;
@@ -300,7 +315,7 @@ header.container {
 }
 
 .prose {
-  color: rgba(234, 241, 255, 0.92);
+  color: var(--text);
   line-height: 1.7;
 }
 .prose code {
@@ -308,32 +323,33 @@ header.container {
   font-size: 12px;
   padding: 2px 6px;
   border-radius: 10px;
-  background: rgba(9, 13, 19, 0.65);
-  border: 1px solid var(--line);
+  background: var(--bg-alt);
+  border: 1px solid var(--line-dark);
+  color: var(--text);
 }
 
 .mono {
   font-family: var(--mono);
   font-size: 12px;
-  color: rgba(234, 241, 255, 0.92);
+  color: var(--text);
 }
 
 .callout {
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(9, 13, 19, 0.45);
-  color: rgba(234, 241, 255, 0.9);
+  border: 1px solid var(--line-dark);
+  background: var(--bg-alt);
+  color: var(--text);
   font-size: 13px;
   line-height: 1.5;
 }
 .callout--ok {
-  border-color: rgba(65, 209, 138, 0.35);
-  background: rgba(65, 209, 138, 0.08);
+  border-color: rgba(22, 163, 74, 0.35);
+  background: rgba(22, 163, 74, 0.08);
 }
 .callout--err {
-  border-color: rgba(255, 90, 106, 0.35);
-  background: rgba(255, 90, 106, 0.08);
+  border-color: rgba(220, 38, 38, 0.35);
+  background: rgba(220, 38, 38, 0.08);
 }
 .hint {
   color: var(--muted);
@@ -344,9 +360,9 @@ header.container {
 .pill {
   padding: 8px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(9, 13, 19, 0.55);
-  color: rgba(234, 241, 255, 0.92);
+  border: 1px solid var(--line-dark);
+  background: var(--bg-alt);
+  color: var(--text);
   font-weight: 900;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
@@ -358,7 +374,7 @@ header.container {
   gap: 8px;
   align-items: center;
   font-size: 13px;
-  color: rgba(234, 241, 255, 0.9);
+  color: var(--text);
   font-weight: 700;
 }
 .checkbox input {
@@ -405,8 +421,8 @@ header.container {
   pointer-events: none;
 }
 .evs-search-input {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--bg);
+  border: 1px solid var(--line-dark);
   color: var(--text);
   border-radius: 999px;
   padding: 8px 14px 8px 30px;
@@ -418,8 +434,8 @@ header.container {
 }
 .evs-search-input:focus { border-color: var(--accent); }
 .evs-select {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--bg);
+  border: 1px solid var(--line-dark);
   color: var(--text);
   border-radius: 999px;
   padding: 8px 14px;
@@ -441,8 +457,8 @@ header.container {
   flex-wrap: wrap;
   gap: 16px;
   align-items: flex-start;
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--bg-alt);
+  border: 1px solid var(--line-dark);
   border-radius: 12px;
   padding: 14px 18px;
   margin-bottom: 18px;
@@ -467,21 +483,21 @@ header.container {
   border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--line-dark);
+  background: var(--bg);
   color: var(--muted);
   cursor: pointer;
   user-select: none;
   transition: all 0.15s;
 }
 .evs-chip.active {
-  background: linear-gradient(135deg, rgba(74,163,255,0.2), rgba(124,92,255,0.15));
-  border-color: rgba(74,163,255,0.45);
-  color: var(--text);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
 }
 .evs-price-in {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--bg);
+  border: 1px solid var(--line-dark);
   color: var(--text);
   border-radius: 8px;
   padding: 6px 10px;
@@ -493,8 +509,8 @@ header.container {
 }
 .evs-price-in:focus { border-color: var(--accent); }
 .evs-reset-btn {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid var(--line);
+  background: var(--bg);
+  border: 1px solid var(--line-dark);
   color: var(--muted);
   border-radius: 999px;
   padding: 5px 12px;
@@ -503,7 +519,7 @@ header.container {
   cursor: pointer;
   transition: all 0.15s;
 }
-.evs-reset-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+.evs-reset-btn:hover { background: var(--bg-alt); color: var(--text); }
 
 /* Loading */
 .evs-loading {
@@ -534,7 +550,7 @@ header.container {
 /* Card */
 .evs-card {
   background: var(--card);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-dark);
   border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
@@ -542,8 +558,8 @@ header.container {
 }
 .evs-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
-  border-color: rgba(74,163,255,0.3);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--accent);
 }
 .evs-card-top {
   padding: 14px 14px 0;
@@ -553,7 +569,6 @@ header.container {
   position: absolute;
   top: 10px; right: 10px;
   font-size: 20px;
-  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
 }
 .evs-brand-label {
   font-size: 10px;
@@ -578,13 +593,13 @@ header.container {
 .evs-img {
   width: 100%;
   height: 140px;
-  background: rgba(255,255,255,0.03);
+  background: var(--bg-alt);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 10px 0 0;
   font-size: 50px;
-  opacity: 0.12;
+  opacity: 0.25;
 }
 .evs-specs {
   padding: 8px 14px 0;
@@ -595,7 +610,7 @@ header.container {
   justify-content: space-between;
   padding: 5px 0;
   font-size: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--line);
 }
 .evs-spec-row:last-child { border-bottom: none; }
 .evs-sk { color: var(--muted); }
@@ -606,14 +621,14 @@ header.container {
   align-items: center;
   justify-content: space-between;
   border-top: 1px solid var(--line);
-  background: rgba(0,0,0,0.15);
+  background: var(--bg-alt);
 }
 .evs-body-badge {
   font-size: 10px;
   padding: 3px 8px;
   border-radius: 4px;
-  background: rgba(74,163,255,0.15);
-  border: 1px solid rgba(74,163,255,0.25);
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.25);
   color: var(--accent);
   font-weight: 600;
   max-width: 110px;
@@ -641,8 +656,8 @@ header.container {
   align-items: center;
   gap: 8px;
   padding: 9px 18px;
-  background: rgba(74,163,255,0.1);
-  border: 1px solid rgba(74,163,255,0.3);
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid var(--accent);
   color: var(--accent);
   border-radius: 999px;
   font-size: 13px;
@@ -650,12 +665,12 @@ header.container {
   cursor: pointer;
   font-weight: 600;
   margin-bottom: 20px;
-  transition: background 0.15s;
+  transition: all 0.15s;
 }
-.evs-back-btn:hover { background: rgba(74,163,255,0.18); }
+.evs-back-btn:hover { background: var(--accent); color: #ffffff; }
 .evs-detail-card {
   background: var(--card);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-dark);
   border-radius: 16px;
   overflow: hidden;
 }
@@ -664,13 +679,13 @@ header.container {
   grid-template-columns: 1fr 1.1fr;
 }
 .evs-hero-img {
-  background: rgba(255,255,255,0.03);
+  background: var(--bg-alt);
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 240px;
   font-size: 90px;
-  opacity: 0.1;
+  opacity: 0.2;
 }
 .evs-hero-info {
   padding: 32px 28px;
@@ -705,20 +720,21 @@ header.container {
   font-size: 11px;
   padding: 3px 10px;
   border-radius: 4px;
-  background: rgba(74,163,255,0.15);
-  border: 1px solid rgba(74,163,255,0.25);
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.25);
   color: var(--accent);
   font-weight: 600;
   margin-bottom: 20px;
 }
 .evs-hero-price-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-.evs-hero-price { font-size: 24px; font-weight: 900; color: var(--text); }
+.evs-hero-price { font-size: 24px; font-weight: 900; color: var(--accent); }
 
 /* Quick stats */
 .evs-qs {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   border-top: 1px solid var(--line);
+  background: var(--bg-alt);
 }
 .evs-qs-item {
   padding: 18px 12px;
@@ -742,13 +758,13 @@ header.container {
   color: var(--muted);
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 2px solid rgba(74,163,255,0.35);
+  border-bottom: 2px solid var(--accent);
   display: flex;
   align-items: center;
   gap: 6px;
 }
 .evs-table { width: 100%; border-collapse: collapse; }
-.evs-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+.evs-table tr:nth-child(even) td { background: var(--bg-alt); }
 .evs-table td {
   padding: 8px 12px;
   font-size: 13px;
