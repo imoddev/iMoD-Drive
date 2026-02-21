@@ -241,11 +241,12 @@
     // Brand chips
     const bc = document.getElementById('evs-brand-chips');
     if (bc) {
-      bc.innerHTML = brands.map(b =>
-        `<span class="evs-chip active" data-brand="${b}" onclick="evsToggleBrand('${b}')">
-          <span class="evs-chip-text"><span class="evs-chip-flag">${FLAGS[b]||'🌐'}</span> ${b}</span>
-        </span>`
-      ).join('');
+      bc.innerHTML = `<div class="evs-check-all" onclick="evsCheckAllBrands()">☑ เลือกทั้งหมด</div>` +
+        brands.map(b =>
+          `<span class="evs-chip active" data-brand="${b}" onclick="evsToggleBrand('${b}')">
+            <span class="evs-chip-text"><span class="evs-chip-flag">${FLAGS[b]||'🌐'}</span> ${b}</span>
+          </span>`
+        ).join('');
       brandActive = new Set(brands);
     }
 
@@ -256,20 +257,22 @@
         'จีน': '🇨🇳', 'สหรัฐอเมริกา': '🇺🇸', 'เยอรมนี': '🇩🇪', 'ญี่ปุ่น': '🇯🇵',
         'เกาหลีใต้': '🇰🇷', 'สวีเดน': '🇸🇪', 'อังกฤษ': '🇬🇧', 'อิตาลี': '🇮🇹'
       };
-      cc.innerHTML = countries.map(c =>
-        `<span class="evs-chip active" data-country="${c}" onclick="evsToggleCountry('${c}')">
-          <span class="evs-chip-text"><span class="evs-chip-flag">${countryFlags[c]||'🌐'}</span> ${c}</span>
-        </span>`
-      ).join('');
+      cc.innerHTML = `<div class="evs-check-all" onclick="evsCheckAllCountries()">☑ เลือกทั้งหมด</div>` +
+        countries.map(c =>
+          `<span class="evs-chip active" data-country="${c}" onclick="evsToggleCountry('${c}')">
+            <span class="evs-chip-text"><span class="evs-chip-flag">${countryFlags[c]||'🌐'}</span> ${c}</span>
+          </span>`
+        ).join('');
       countryActive = new Set(countries);
     }
 
     // Body type chips
     const tc = document.getElementById('evs-body-chips');
     if (tc) {
-      tc.innerHTML = types.map(t =>
-        `<span class="evs-chip active" data-body="${t}" onclick="evsToggleBody('${t}')"><span class="evs-chip-text">${t}</span></span>`
-      ).join('');
+      tc.innerHTML = `<div class="evs-check-all" onclick="evsCheckAllBody()">☑ เลือกทั้งหมด</div>` +
+        types.map(t =>
+          `<span class="evs-chip active" data-body="${t}" onclick="evsToggleBody('${t}')"><span class="evs-chip-text">${t}</span></span>`
+        ).join('');
       bodyActive = new Set(types);
     }
   }
@@ -288,6 +291,49 @@
   window.evsToggleCountry = function(c) {
     if (countryActive.has(c)) countryActive.delete(c); else countryActive.add(c);
     document.querySelectorAll(`[data-country="${c}"]`).forEach(el => el.classList.toggle('active', countryActive.has(c)));
+    evsApply();
+  };
+
+  // Check All functions
+  window.evsCheckAllBrands = function() {
+    const brands = [...new Set(allCars.map(c => c.brand))];
+    const allChecked = brands.every(b => brandActive.has(b));
+    if (allChecked) {
+      brandActive.clear();
+    } else {
+      brandActive = new Set(brands);
+    }
+    document.querySelectorAll('[data-brand]').forEach(el => {
+      el.classList.toggle('active', brandActive.has(el.dataset.brand));
+    });
+    evsApply();
+  };
+
+  window.evsCheckAllCountries = function() {
+    const countries = [...new Set(allCars.map(c => c.country).filter(Boolean))];
+    const allChecked = countries.every(c => countryActive.has(c));
+    if (allChecked) {
+      countryActive.clear();
+    } else {
+      countryActive = new Set(countries);
+    }
+    document.querySelectorAll('[data-country]').forEach(el => {
+      el.classList.toggle('active', countryActive.has(el.dataset.country));
+    });
+    evsApply();
+  };
+
+  window.evsCheckAllBody = function() {
+    const types = [...new Set(allCars.map(c => (c.bodyType||'').split('/')[0].trim()).filter(Boolean))];
+    const allChecked = types.every(t => bodyActive.has(t));
+    if (allChecked) {
+      bodyActive.clear();
+    } else {
+      bodyActive = new Set(types);
+    }
+    document.querySelectorAll('[data-body]').forEach(el => {
+      el.classList.toggle('active', bodyActive.has(el.dataset.body));
+    });
     evsApply();
   };
 
